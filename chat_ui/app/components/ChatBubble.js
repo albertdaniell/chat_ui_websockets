@@ -33,7 +33,7 @@ function ChatBubble({ user, msg, date, isCurrentUser, type }) {
           className={`w-auto rounded-full p-2 bg-gray-100 justify-self-center 
            `}
         >
-          <p className="text-gray-800 mt-1 text-xs text-center">{msg}</p>
+          <p className="text-gray-500 mt-1 text-xs text-center">{msg}</p>
         </div>
       )}
     </div>

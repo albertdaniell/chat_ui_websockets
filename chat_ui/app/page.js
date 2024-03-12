@@ -26,10 +26,10 @@ export default function Home() {
             type: "join_msg",
             value: `${userSelected} joined chat`,
             user: userSelected,
+            date: new Date(),
           })
         );
       };
-      
 
       ws.onmessage = (event) => {
         // Handle incoming messages
@@ -55,12 +55,15 @@ export default function Home() {
     SetUserSelected(val);
   };
 
-  const sendMessage = () => {
+  const sendMessage = (e) => {
+    e.preventDefault();
+
     ws.send(
       JSON.stringify({
         type: "chat_msg",
         value: text,
         user: userSelected,
+        date: new Date(),
       })
     );
     console.log("Sent!");
@@ -84,8 +87,34 @@ export default function Home() {
         <div dangerouslySetInnerHTML={{ __html: text }} />
       </div> */}
 
+          {!userSelected && (
+            <>
+              {users.map((user) => {
+                return (
+                  <button
+                    onClick={() => selectUser(user)}
+                    className="text-green-700 my-3 mx-2 bg-gray-100 p-3 rounded-full"
+                  >
+                    {user}
+                  </button>
+                );
+              })}
+            </>
+          )}
+
           <div className="h-[90%] overflow-auto">
-            <ChatBubble msg="haha hahah hahah" user="Daniel"></ChatBubble>
+            {messages.map((msg) => {
+              return (
+                <ChatBubble
+                type={msg.type}
+                date={msg.date}
+                  isCurrentUser={msg.user === userSelected}
+                  msg={msg.value}
+                  user={msg.user}
+                ></ChatBubble>
+              );
+            })}
+            {/* <ChatBubble msg="haha hahah hahah" user="Daniel"></ChatBubble>
             <ChatBubble msg="haha hahah hahah" user="Daniel" isCurrentUser={true}></ChatBubble>
             <ChatBubble msg="haha hahah hahah" user="Daniel" isCurrentUser={true}></ChatBubble>
             <ChatBubble msg="haha hahah hahah" user="Daniel" isCurrentUser={true}></ChatBubble>
@@ -94,27 +123,30 @@ export default function Home() {
             <ChatBubble msg="haha hahah hahah" user="Daniel" isCurrentUser={true}></ChatBubble>
             <ChatBubble msg="haha hahah hahah" user="Daniel" isCurrentUser={true}></ChatBubble>
             <ChatBubble msg="haha hahah hahah" user="Daniel" isCurrentUser={true}></ChatBubble>
-            <ChatBubble msg="haha hahah hahah" user="Daniel" isCurrentUser={true}></ChatBubble>
-
+            <ChatBubble msg="haha hahah hahah" user="Daniel" isCurrentUser={true}></ChatBubble> */}
           </div>
-          <div className="h-[10%] w-[100%]">
-            <div className="flex">
-              <div className="w-[90%] p-3">
-                <textarea
-                  className="w-[100%] p-2 rounded-lg"
-                  value={text}
-                  onChange={handleTextareaChange}
-                  rows={2}
-                  cols={30}
-                  placeholder="Enter your text here..."
-                />
-              </div>
+          {userSelected && (
+            <div className="h-[10%] w-[100%]">
+              <form onSubmit={sendMessage}>
+                <div className="flex">
+                  <div className="w-[90%] p-3">
+                    <textarea
+                      className="w-[100%] p-2 rounded-lg text-black"
+                      value={text}
+                      onChange={handleTextareaChange}
+                      rows={2}
+                      cols={30}
+                      placeholder="Enter your text here..."
+                    />
+                  </div>
 
-              <div className="w-[10%]">
-                <button className="p-2">Submit</button>
-              </div>
+                  <div className="w-[10%]" onClick={sendMessage}>
+                    <button className="p-2 text-black">Submit</button>
+                  </div>
+                </div>
+              </form>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </>

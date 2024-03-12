@@ -131,8 +131,8 @@ export default function Home() {
                 <div className="flex">
                   <div className="w-[90%] p-3">
                     <textarea
-                      className="w-[100%] p-2 rounded-lg text-black"
-                      value={text}
+                      className="w-[100%] p-5 rounded-lg text-black bg-gray-100"
+                      // value={text}
                       onChange={handleTextareaChange}
                       rows={2}
                       cols={30}

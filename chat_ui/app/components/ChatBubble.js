@@ -5,7 +5,7 @@ function ChatBubble({ user, msg, date, isCurrentUser, type }) {
     <div className="grid mt-3">
       {type !== "join_msg" ? (
         <div
-          className={`w-[80%] rounded-lg p-3  ${
+          className={`max-w-[80%] min-w-auto rounded-lg p-3  ${
             type == "join_msg"
               ? "justify-self-center"
               : isCurrentUser

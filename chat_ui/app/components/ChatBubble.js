@@ -5,12 +5,12 @@ function ChatBubble({ user, msg, date, isCurrentUser, type }) {
     <div className="grid mt-3">
       {type !== "join_msg" ? (
         <div
-          className={`w-[80%] rounded-lg p-3 bg-blue-100 ${
+          className={`w-[80%] rounded-lg p-3  ${
             type == "join_msg"
               ? "justify-self-center"
               : isCurrentUser
-              ? "justify-self-end"
-              : "justify-self-start"
+              ? "justify-self-end bg-blue-100"
+              : "justify-self-start bg-green-100"
           }`}
         >
           {type !== "join_msg" ? (

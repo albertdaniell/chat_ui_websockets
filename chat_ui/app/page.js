@@ -87,27 +87,38 @@ export default function Home() {
         <div dangerouslySetInnerHTML={{ __html: text }} />
       </div> */}
 
-          {!userSelected && (
-            <>
-              {users.map((user) => {
-                return (
-                  <button
-                    onClick={() => selectUser(user)}
-                    className="text-green-700 my-3 mx-2 bg-gray-100 p-3 rounded-full"
-                  >
-                    {user}
-                  </button>
-                );
-              })}
-            </>
-          )}
+         
+
+          <center>
+            {!userSelected && (
+              <>
+               <p className="text-black text-xl text-center my-3">
+            Welcome to the Websocket Chat. Select a user below to begin chatting
+          </p>
+          <hr></hr>
+                {users.map((user) => {
+                  return (
+                    <>
+                      <button
+                        onClick={() => selectUser(user)}
+                        className="text-green-700 my-3 mx-2 bg-gray-100 p-3 rounded-full w-[40%]"
+                      >
+                        {user}
+                      </button>
+                      <br></br>
+                    </>
+                  );
+                })}
+              </>
+            )}
+          </center>
 
           <div className="h-[90%] overflow-auto">
             {messages.map((msg) => {
               return (
                 <ChatBubble
-                type={msg.type}
-                date={msg.date}
+                  type={msg.type}
+                  date={msg.date}
                   isCurrentUser={msg.user === userSelected}
                   msg={msg.value}
                   user={msg.user}

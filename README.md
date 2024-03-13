@@ -14,4 +14,5 @@ run npm run dev
 
 open http://localhost:3000 on two browser apps to simulate two users logged in and chatting with each other
 
-<img width="909" alt="image" src="https://github.com/albertdaniell/chat_ui_websockets/assets/25503391/53b61314-b035-4ab9-8f50-45a1ffb69c97">
+<img width="761" alt="image" src="https://github.com/albertdaniell/chat_ui_websockets/assets/25503391/4082e08d-4cfd-4c20-b608-51388445e928">
+

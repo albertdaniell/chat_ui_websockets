@@ -1,4 +1,4 @@
-A simple app that implements chat module using websockets with pythonb and nextjs, tailwind and react
+A simple app that implements chat module using websockets with python, nextjs, tailwind for User interface and react
 This code is still under development
 
 Steps to run the python code

@@ -1,20 +1,17 @@
 "use client";
-import Image from "next/image";
 import { useEffect, useState } from "react";
 import ChatBubble from "./components/ChatBubble";
-import useWebSocket, { ReadyState }  from "react-use-websocket";
+import useWebSocket, { ReadyState } from "react-use-websocket";
 
 export default function Home() {
-  const WS_URL = "ws://localhost:8765"
-
-  let ws = new WebSocket("ws://localhost:8765");
+  const WS_URL = "ws://localhost:8765";
   const { sendJsonMessage, lastJsonMessage, readyState } = useWebSocket(
     WS_URL,
     {
       share: false,
       shouldReconnect: () => true,
-    },
-  )
+    }
+  );
   const [text, setText] = useState("");
   const [text2, setText2] = useState("");
 
@@ -31,77 +28,34 @@ export default function Home() {
 
   useEffect(() => {
     if (userSelected !== null) {
-
-                
-
-    console.log("Connection state changed")
-    if (readyState === ReadyState.OPEN) {
-      sendJsonMessage({
-        type: "join_msg",
-        value: `${userSelected} joined chat`,
-        user: userSelected,
-        date: new Date(),
-      })
+      console.log("Connection state changed");
+      if (readyState === ReadyState.OPEN) {
+        sendJsonMessage({
+          type: "join_msg",
+          value: `${userSelected} joined chat`,
+          user: userSelected,
+          date: new Date(),
+        });
+      }
     }
-  }
-  }, [readyState,userSelected])
+  }, [readyState, userSelected]);
 
   useEffect(() => {
-    console.log(`Got a new message: ${lastJsonMessage}`)
+    console.log(`Got a new message: ${lastJsonMessage}`);
 
-    console.log(lastJsonMessage)
-        
-        // Handle incoming messages
+    console.log(lastJsonMessage);
 
-        let msg =lastJsonMessage;
-        let new_msg_array = [...messages, msg];
-        // msg = JSON.parse(msg);
-        console.log(messages);
+    // Handle incoming messages
 
-        lastJsonMessage && SetMessages((messages) => [...messages, msg]);
+    let msg = lastJsonMessage;
+    let new_msg_array = [...messages, msg];
+    // msg = JSON.parse(msg);
+    console.log(messages);
 
-      
-
-  }, [lastJsonMessage])
-
-  // useEffect(() => {
-  //   if (userSelected !== null) {
-  //     ws.onopen = () => {
-  //       console.log("Connected to WebSocket server");
-  //       setTimeout(() => {
-  //         ws.send(
-  //           JSON.stringify({
-  //             type: "join_msg",
-  //             value: `${userSelected} joined chat`,
-  //             user: userSelected,
-  //             date: new Date(),
-  //           })
-  //         );
-  //       }, 1000);
-  //     };
-
-  //     ws.onmessage = (event) => {
-  //       // Handle incoming messages
-
-  //       let msg = event.data;
-  //       let new_msg_array = [...messages, msg];
-  //       msg = JSON.parse(msg);
-  //       console.log({ new_msg_array });
-  //       SetMessages((messages) => [...messages, msg]);
-
-  //       console.log("Received:", event.data);
-  //     };
-  //     ws.onclose = () => {
-  //       console.log("Disconnected from WebSocket server");
-  //     };
-  //     return () => {
-  //       ws.close();
-  //     };
-  //   }
-  // }, [userSelected]);
+    lastJsonMessage && SetMessages((messages) => [...messages, msg]);
+  }, [lastJsonMessage]);
 
  
-
   const waitForOpenConnection = (socket) => {
     return new Promise((resolve, reject) => {
       const maxNumberOfAttempts = 10;
@@ -127,7 +81,6 @@ export default function Home() {
 
   // const handleSendMessage = useCallback(() => sendMessage('Hello'), []);
 
-
   const sendMessage = async (e) => {
     e.preventDefault();
 
@@ -136,25 +89,16 @@ export default function Home() {
       value: text,
       user: userSelected,
       date: new Date(),
-    })
+    });
 
-   
-
-    // ws.close()
-    // socket.emit('chat message', newMessage);
-    // setNewMessage('');
+  
   };
-  // <main className="flex min-h-screen flex-col items-center justify-between p-24">
 
   return (
     <>
       <div className="h-[100vh]  flex justify-center items-center">
         <div className="m-0 w-[50%] bg-white h-[100%] p-3">
-          {/* <div>
-        Preview:
-        <div dangerouslySetInnerHTML={{ __html: text }} />
-      </div> */}
-
+        
           <center>
             {!userSelected && (
               <>
@@ -181,34 +125,23 @@ export default function Home() {
           </center>
 
           <div className="h-[90%] overflow-auto">
+            {messages.length !== 0 && userSelected && (
+              <>
+                {messages.map((msg) => {
+                  return (
+                    <ChatBubble
+                      type={msg.type}
+                      date={msg.date}
+                      isCurrentUser={msg.user === userSelected}
+                      msg={msg.value}
+                      user={msg.user}
+                    ></ChatBubble>
+                  );
+                })}
+              </>
+            )}
 
-          {messages.length !== 0 && userSelected &&
-          
-        <>
-          {messages.map((msg) => {
-            return (
-              <ChatBubble
-                type={msg.type}
-                date={msg.date}
-                isCurrentUser={msg.user === userSelected}
-                msg={msg.value}
-                user={msg.user}
-              ></ChatBubble>
-            );
-          })}
-        </>
-          }
-
-            {/* <ChatBubble msg="haha hahah hahah" user="Daniel"></ChatBubble>
-            <ChatBubble msg="haha hahah hahah" user="Daniel" isCurrentUser={true}></ChatBubble>
-            <ChatBubble msg="haha hahah hahah" user="Daniel" isCurrentUser={true}></ChatBubble>
-            <ChatBubble msg="haha hahah hahah" user="Daniel" isCurrentUser={true}></ChatBubble>
-            <ChatBubble msg="haha hahah hahah" user="Daniel" isCurrentUser={true}></ChatBubble>
-            <ChatBubble msg="haha hahah hahah" user="Daniel" isCurrentUser={true}></ChatBubble>
-            <ChatBubble msg="haha hahah hahah" user="Daniel" isCurrentUser={true}></ChatBubble>
-            <ChatBubble msg="haha hahah hahah" user="Daniel" isCurrentUser={true}></ChatBubble>
-            <ChatBubble msg="haha hahah hahah" user="Daniel" isCurrentUser={true}></ChatBubble>
-            <ChatBubble msg="haha hahah hahah" user="Daniel" isCurrentUser={true}></ChatBubble> */}
+           
           </div>
           {userSelected && (
             <div className="h-[10%] w-[100%]">

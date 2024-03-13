@@ -2,10 +2,22 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import ChatBubble from "./components/ChatBubble";
+import useWebSocket, { ReadyState }  from "react-use-websocket";
 
 export default function Home() {
+  const WS_URL = "ws://localhost:8765"
+
   let ws = new WebSocket("ws://localhost:8765");
+  const { sendJsonMessage, lastJsonMessage, readyState } = useWebSocket(
+    WS_URL,
+    {
+      share: false,
+      shouldReconnect: () => true,
+    },
+  )
   const [text, setText] = useState("");
+  const [text2, setText2] = useState("");
+
   const [userSelected, SetUserSelected] = useState(null);
   const [messages, SetMessages] = useState([]);
 
@@ -19,60 +31,116 @@ export default function Home() {
 
   useEffect(() => {
     if (userSelected !== null) {
-      ws.onopen = () => {
-        console.log("Connected to WebSocket server");
-        ws.send(
-          JSON.stringify({
-            type: "join_msg",
-            value: `${userSelected} joined chat`,
-            user: userSelected,
-            date: new Date(),
-          })
-        );
-      };
 
-      ws.onmessage = (event) => {
+                
+
+    console.log("Connection state changed")
+    if (readyState === ReadyState.OPEN) {
+      sendJsonMessage({
+        type: "join_msg",
+        value: `${userSelected} joined chat`,
+        user: userSelected,
+        date: new Date(),
+      })
+    }
+  }
+  }, [readyState,userSelected])
+
+  useEffect(() => {
+    console.log(`Got a new message: ${lastJsonMessage}`)
+
+    console.log(lastJsonMessage)
+        
         // Handle incoming messages
 
-        let msg = event.data;
+        let msg =lastJsonMessage;
         let new_msg_array = [...messages, msg];
-        msg = JSON.parse(msg);
-        console.log({ new_msg_array });
-        SetMessages((messages) => [...messages, msg]);
+        // msg = JSON.parse(msg);
+        console.log(messages);
 
-        console.log("Received:", event.data);
-      };
-      ws.onclose = () => {
-        console.log("Disconnected from WebSocket server");
-      };
-      return () => {
-        ws.close();
-      };
-    }
-  }, [userSelected]);
+        lastJsonMessage && SetMessages((messages) => [...messages, msg]);
+
+      
+
+  }, [lastJsonMessage])
+
+  // useEffect(() => {
+  //   if (userSelected !== null) {
+  //     ws.onopen = () => {
+  //       console.log("Connected to WebSocket server");
+  //       setTimeout(() => {
+  //         ws.send(
+  //           JSON.stringify({
+  //             type: "join_msg",
+  //             value: `${userSelected} joined chat`,
+  //             user: userSelected,
+  //             date: new Date(),
+  //           })
+  //         );
+  //       }, 1000);
+  //     };
+
+  //     ws.onmessage = (event) => {
+  //       // Handle incoming messages
+
+  //       let msg = event.data;
+  //       let new_msg_array = [...messages, msg];
+  //       msg = JSON.parse(msg);
+  //       console.log({ new_msg_array });
+  //       SetMessages((messages) => [...messages, msg]);
+
+  //       console.log("Received:", event.data);
+  //     };
+  //     ws.onclose = () => {
+  //       console.log("Disconnected from WebSocket server");
+  //     };
+  //     return () => {
+  //       ws.close();
+  //     };
+  //   }
+  // }, [userSelected]);
+
+ 
+
+  const waitForOpenConnection = (socket) => {
+    return new Promise((resolve, reject) => {
+      const maxNumberOfAttempts = 10;
+      const intervalTime = 200; //ms
+
+      let currentAttempt = 0;
+      const interval = setInterval(() => {
+        if (currentAttempt > maxNumberOfAttempts - 1) {
+          clearInterval(interval);
+          reject(new Error("Maximum number of attempts exceeded"));
+        } else if (socket.readyState === socket.OPEN) {
+          clearInterval(interval);
+          resolve();
+        }
+        currentAttempt++;
+      }, intervalTime);
+    });
+  };
 
   const selectUser = (val) => {
     SetUserSelected(val);
   };
 
-  const sendMessage = (e) => {
+  // const handleSendMessage = useCallback(() => sendMessage('Hello'), []);
+
+
+  const sendMessage = async (e) => {
     e.preventDefault();
 
-    ws.send(
-      JSON.stringify({
-        type: "chat_msg",
-        value: text,
-        user: userSelected,
-        date: new Date(),
-      })
-    );
-    console.log("Sent!");
-    setText("");
+    sendJsonMessage({
+      type: "chat_msg",
+      value: text,
+      user: userSelected,
+      date: new Date(),
+    })
 
-    setTimeout(() => {
-      setText(null);
-    }, 100);
+   
 
+    // ws.close()
     // socket.emit('chat message', newMessage);
     // setNewMessage('');
   };
@@ -87,15 +155,14 @@ export default function Home() {
         <div dangerouslySetInnerHTML={{ __html: text }} />
       </div> */}
 
-         
-
           <center>
             {!userSelected && (
               <>
-               <p className="text-black text-xl text-center my-3">
-            Welcome to the Websocket Chat. Select a user below to begin chatting
-          </p>
-          <hr></hr>
+                <p className="text-black text-xl text-center my-3">
+                  Welcome to the Websocket Chat. Select a user below to begin
+                  chatting
+                </p>
+                <hr></hr>
                 {users.map((user) => {
                   return (
                     <>
@@ -114,17 +181,24 @@ export default function Home() {
           </center>
 
           <div className="h-[90%] overflow-auto">
-            {messages.map((msg) => {
-              return (
-                <ChatBubble
-                  type={msg.type}
-                  date={msg.date}
-                  isCurrentUser={msg.user === userSelected}
-                  msg={msg.value}
-                  user={msg.user}
-                ></ChatBubble>
-              );
-            })}
+
+          {messages.length !== 0 && userSelected &&
+          
+        <>
+          {messages.map((msg) => {
+            return (
+              <ChatBubble
+                type={msg.type}
+                date={msg.date}
+                isCurrentUser={msg.user === userSelected}
+                msg={msg.value}
+                user={msg.user}
+              ></ChatBubble>
+            );
+          })}
+        </>
+          }
+
             {/* <ChatBubble msg="haha hahah hahah" user="Daniel"></ChatBubble>
             <ChatBubble msg="haha hahah hahah" user="Daniel" isCurrentUser={true}></ChatBubble>
             <ChatBubble msg="haha hahah hahah" user="Daniel" isCurrentUser={true}></ChatBubble>
@@ -143,7 +217,7 @@ export default function Home() {
                   <div className="w-[90%] p-3">
                     <textarea
                       className="w-[100%] p-5 rounded-lg text-black bg-gray-100"
-                      // value={text}
+                      value={text}
                       onChange={handleTextareaChange}
                       rows={2}
                       cols={30}
